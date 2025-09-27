@@ -3,7 +3,7 @@ package project_java.Java_Marketplace;
 import java.util.Scanner;
 import java.lang.Integer;
 
-public class HistSt {
+public class project {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in); // Cria o Scanner
         boolean baseStart = false; // Define verificador de inicialização das bases
