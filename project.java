@@ -1,4 +1,4 @@
-package project_java.Java_Marketplace;
+package Java_Marketplace;
 
 import java.util.Scanner;
 import java.lang.Integer;
@@ -20,33 +20,39 @@ public class project {
         double[] precosProdutos = { 250.00, 200.50, 520.50, 130.50, 120.00 }; // Preços dos produtos em catálogo
         int[] estoquesProdutos = { 8, 10, 5, 7, 3 }; // Estoque dos produtos em catálogo
 
-        String[] historicoIdsPedidos = new String[0];
-        double[] historicoValoresPedidos = new double[0];
-        String[][] historicoItensVendidos = new String[0][0];
-
         while (!baseStart) {
             escolha = displayMenu();
             if (escolha == 1) {
-                baseStart = true;
-                System.out.println("inicializaBase()");
                 System.out.println("Base inicializada!");
+                baseStart = true;
             } else {
                 System.out.println("ERRO: A base deve ser inicializada antes de tudo!");
             }
             System.out.println();
         }
 
-        while (true) {
+        String[] historicoIdsPedidos = new String[0];
+        double[] historicoValoresPedidos = new double[0];
+        String[][] historicoItensVendidos = new String[0][0];
+        int[] vendaAtualIds = new int[0];
+        int[] vendaAtualQtds = new int[0];
+
+        do {
             escolha = displayMenu();
             switch (escolha) {
                 case 1:
                     System.out.println("A base já foi inicializada!");
                     break;
                 case 2:
-                    System.out.println("catalogoProdutos()");
+                    exibirCatalogo(nomesProdutos, idsProdutos, precosProdutos, estoquesProdutos);
+                    System.out.println();
                     break;
                 case 3:
-                    System.out.println("adicionarNoCarrinho()");
+                    vendaAtualIds = addItemID(idsProdutos, estoquesProdutos, vendaAtualIds);
+                    vendaAtualQtds = addItemQtd(vendaAtualQtds, estoquesProdutos, vendaAtualIds, idsProdutos);
+                    estoquesProdutos = atualizaEstoque(vendaAtualIds, idsProdutos, vendaAtualQtds, estoquesProdutos);
+                    System.out.println();
+                    System.out.println();
                     break;
                 case 4:
                     System.out.println("resumoVenda()");
@@ -66,8 +72,11 @@ public class project {
                 case 9:
                     System.out.println("relatorioEstoqueBaixo()");
                     break;
+                default:
+                    System.out.println("ERRO: Opção Inválida!");
+                    System.out.println();
             }
-        }
+        } while (escolha != 0);
     }
 
     public static int displayMenu() {
@@ -84,11 +93,151 @@ public class project {
         System.out.println("7 - Buscar venda específica do histórico");
         System.out.println("8 - (Admin) Repor estoque");
         System.out.println("9 - (Admin) Relatório de estoque baixo");
-
         System.out.print("---- Opção: ");
         int escolha = sc.nextInt();
 
         return escolha;
+    }
+
+    public static void exibirCatalogo(String[] nomes, int[] idsProd, double[] precos, int[] estoque) {
+        int emEstoque = 0;
+        for (int q : estoque) {
+            if (q > 0) {
+                emEstoque++;
+            }
+        }
+        int[] prodsEstoque = new int[emEstoque];
+        int j = 0;
+        for (int i = 0; i < estoque.length; i++) {
+            if (estoque[i] > 0) {
+                prodsEstoque[j] = i;
+                j++;
+            }
+        }
+        System.out.println();
+        System.out.println("**********CATÁLOGO DE PRODUTOS**********");
+        System.out.printf("%-3s | %-25s | %s\n", "ID", "PRODUTO", "PREÇO");
+        System.out.println("----------------------------------------");
+        for (int a : prodsEstoque) {
+            System.out.printf("%d | %-25s | %.2f\n", idsProd[a], nomes[a], precos[a]);
+        }
+    }
+
+    public static int[] addItemID(int[] idsProd, int[] estoqueProd, int[] atualIds) {
+        while (true) {
+            Scanner sc = new Scanner(System.in);
+            boolean idExists = false;
+            int qtdIdEstoque = -1;
+            int totalEstoque = 0;
+            for(int a : estoqueProd){
+                if(a > 0){
+                    totalEstoque ++;
+                }
+            }
+            if(totalEstoque == 0){
+                System.out.println("ERRO: O estoque está totalmente vazio!");
+                int[] emptyreturn = new int[atualIds.length];
+                for(int i = 0; i < atualIds.length; i++){
+                    emptyreturn[i] = atualIds[i];
+                }
+                return emptyreturn;
+            }
+
+            System.out.print("Digite o ID do produto: ");
+            int addId = sc.nextInt();
+            sc.nextLine();
+
+            for (int i = 0; i < idsProd.length; i++) {
+                if (addId == idsProd[i]) {
+                    idExists = true;
+                    qtdIdEstoque = estoqueProd[i];
+                }
+            }
+            if (!idExists) {
+                System.out.println("ERRO: Esse ID não existe no catálogo!");
+                continue;
+            } else if (qtdIdEstoque == 0) {
+                System.out.println("ERRO: O produto não está mais em estoque!");
+                continue;
+            } else {
+                int[] newAtualIds = new int[atualIds.length + 1];
+                for (int i = 0; i < atualIds.length; i++) {
+                    newAtualIds[i] = atualIds[i];
+                }
+                newAtualIds[atualIds.length] = addId;
+                return newAtualIds;
+            }
+        }
+    }
+
+    public static int[] addItemQtd(int[] atualQtds, int[] estoqueAtual, int[] atualIds, int[] idsCatalogo) {
+        int lastId = atualIds[atualIds.length - 1];
+        int indexCatalog = -1;
+        for (int i = 0; i < idsCatalogo.length; i++) {
+            if (idsCatalogo[i] == lastId) {
+                indexCatalog = i;
+            }
+        }
+        int qtdEstoque = estoqueAtual[indexCatalog];
+
+        while (true) {
+            Scanner sc = new Scanner(System.in);
+            int totalEstoque = 0;
+            for(int a : estoqueAtual){
+                if(a > 0){
+                    totalEstoque ++;
+                }
+            }
+            if(totalEstoque == 0){
+                int[] emptyreturn = new int[atualQtds.length];
+                for(int i = 0; i < atualQtds.length; i++){
+                    emptyreturn[i] = atualQtds[i];
+                }
+                return emptyreturn;
+            }
+
+            System.out.print("Digite a Quantidade do produto: ");
+            int addQtd = sc.nextInt();
+            sc.nextLine();
+
+            if (qtdEstoque - addQtd < 0) {
+                System.out.println("ERRO: Estoque insuficiente!");
+                System.out.printf("Há %d unidades desse produto disponíveis!\n", qtdEstoque);
+                continue;
+            } else {
+                int[] newAtualQtds = new int[atualQtds.length + 1];
+                for (int i = 0; i < atualQtds.length; i++) {
+                    newAtualQtds[i] = atualQtds[i];
+                }
+                newAtualQtds[atualQtds.length] = addQtd;
+                return newAtualQtds;
+            }
+        }
+    }
+
+    public static int[] atualizaEstoque(int[] atualIds, int[] idsCatalogo, int[] atualQtds, int[] estoqueAtual) {
+        int lastId = atualIds[atualIds.length - 1];
+        int lastQtd = atualQtds[atualQtds.length - 1];
+        int getNewIndex = -1;
+        int novaQtd;
+
+        for (int i = 0; i < idsCatalogo.length; i++) {
+            if (idsCatalogo[i] == lastId) {
+                getNewIndex = i;
+            }
+        }
+        novaQtd = estoqueAtual[getNewIndex] - lastQtd;
+
+        int[] newEstoque = new int[estoqueAtual.length];
+        for (int el = 0; el < estoqueAtual.length; el++) {
+            newEstoque[el] = estoqueAtual[el];
+        }
+        if(novaQtd < 0){
+            novaQtd = 0;
+        }
+        newEstoque[getNewIndex] = novaQtd;
+
+        return newEstoque;
     }
 
     public static String[] defIdPedido(String[] histIds) {
