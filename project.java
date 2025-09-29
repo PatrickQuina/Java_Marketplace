@@ -2,6 +2,8 @@ package Java_Marketplace;
 
 import java.util.Scanner;
 import java.lang.Integer;
+import java.time.LocalDateTime; // AI Help
+import java.time.format.DateTimeFormatter; // AI Help
 
 public class project {
     public static void main(String[] args) {
@@ -58,7 +60,17 @@ public class project {
                     System.out.println("resumoVenda()");
                     break;
                 case 5:
-                    System.out.println("finalizarVenda()");
+                    if(vendaAtualIds.length == 0){
+                        System.out.println("ERRO: Não há venda sendo realizada no momento!");
+                    } else{
+                        System.out.println("finalizarVenda()");
+                        historicoIdsPedidos = defIdPedido(historicoIdsPedidos);
+                        historicoValoresPedidos = defValTotal(historicoValoresPedidos, vendaAtualIds, idsProdutos, vendaAtualQtds, precosProdutos);
+                        historicoItensVendidos = defHistItems(historicoItensVendidos, historicoIdsPedidos, vendaAtualIds, vendaAtualQtds);
+                        finalizarVenda(historicoIdsPedidos, idsProdutos, nomesProdutos, vendaAtualIds, vendaAtualQtds, precosProdutos, historicoValoresPedidos);
+                        vendaAtualIds = new int[0];
+                        vendaAtualQtds = new int[0];
+                    }
                     break;
                 case 6:
                     System.out.println("historicoVendas()");
@@ -129,15 +141,15 @@ public class project {
             boolean idExists = false;
             int qtdIdEstoque = -1;
             int totalEstoque = 0;
-            for(int a : estoqueProd){
-                if(a > 0){
-                    totalEstoque ++;
+            for (int a : estoqueProd) {
+                if (a > 0) {
+                    totalEstoque++;
                 }
             }
-            if(totalEstoque == 0){
+            if (totalEstoque == 0) {
                 System.out.println("ERRO: O estoque está totalmente vazio!");
                 int[] emptyreturn = new int[atualIds.length];
-                for(int i = 0; i < atualIds.length; i++){
+                for (int i = 0; i < atualIds.length; i++) {
                     emptyreturn[i] = atualIds[i];
                 }
                 return emptyreturn;
@@ -183,14 +195,14 @@ public class project {
         while (true) {
             Scanner sc = new Scanner(System.in);
             int totalEstoque = 0;
-            for(int a : estoqueAtual){
-                if(a > 0){
-                    totalEstoque ++;
+            for (int a : estoqueAtual) {
+                if (a > 0) {
+                    totalEstoque++;
                 }
             }
-            if(totalEstoque == 0){
+            if (totalEstoque == 0) {
                 int[] emptyreturn = new int[atualQtds.length];
-                for(int i = 0; i < atualQtds.length; i++){
+                for (int i = 0; i < atualQtds.length; i++) {
                     emptyreturn[i] = atualQtds[i];
                 }
                 return emptyreturn;
@@ -232,7 +244,7 @@ public class project {
         for (int el = 0; el < estoqueAtual.length; el++) {
             newEstoque[el] = estoqueAtual[el];
         }
-        if(novaQtd < 0){
+        if (novaQtd < 0) {
             novaQtd = 0;
         }
         newEstoque[getNewIndex] = novaQtd;
@@ -263,47 +275,98 @@ public class project {
         return newHistIds;
     }
 
-    public static double[] defValTotal(double[] histVals) {
-        Scanner sc = new Scanner(System.in);
-        double valorVenda;
+    public static double[] defValTotal(double[] histVals, int[] atualIds, int[] idsCatalogo, int[] atualQtds, double[] precos) {
+        double valorTotal = 0;
         double[] newTotalVls;
+        int getQtdIndex = 0;
 
-        System.out.println("Digite o valor total: ");
-        valorVenda = sc.nextDouble();
-        sc.nextLine();
+        for(int id : atualIds){
+            int qtdProd = atualQtds[getQtdIndex];
+            getQtdIndex ++;
+            int getIndex = -1;
+            for(int i = 0; i < idsCatalogo.length; i++){
+                if(idsCatalogo[i] == id){
+                    getIndex = i;
+                }
+            }
+            double valorProd = precos[getIndex] * qtdProd;
+            valorTotal += valorProd;
+        }
 
         newTotalVls = new double[histVals.length + 1];
         for (int i = 0; i < histVals.length; i++) {
             newTotalVls[i] = histVals[i];
         }
-        newTotalVls[histVals.length] = valorVenda;
+        newTotalVls[histVals.length] = valorTotal;
         return newTotalVls;
     }
 
-    public static String[][] defHistItems(String[][] histIts, String[] histIdsPed, int contId) {
-        Scanner sc = new Scanner(System.in);
-        String prodId;
-        int vendQtd;
-        int newMatrizSize = histIts.length + 1;
+    public static String[][] defHistItems(String[][] histItems, String[] histIdsPed, int[] atualIds, int[] atualQtds) {
+        String pedId = histIdsPed[histIdsPed.length - 1];
+        int toAdd = atualIds.length;
+        int newMatrizSize = histItems.length + toAdd;
         String[][] newHistItems = new String[newMatrizSize][3];
 
-        System.out.println("Digite o ID de produto: ");
-        prodId = sc.nextLine();
-        System.out.println("Digite a qtd do produto: ");
-        vendQtd = sc.nextInt();
-        sc.nextLine();
-
-        for (int i = 0; i < histIts.length; i++) {
-            for (int j = 0; j < histIts[0].length; j++) {
-                newHistItems[i][j] = histIts[i][j];
+        for (int i = 0; i < histItems.length; i++) {
+            for (int j = 0; j < histItems[0].length; j++) {
+                newHistItems[i][j] = histItems[i][j];
             }
         }
 
-        String pedId = histIdsPed[contId];
-        newHistItems[newMatrizSize - 1][0] = pedId;
-        newHistItems[newMatrizSize - 1][1] = prodId;
-        newHistItems[newMatrizSize - 1][2] = String.valueOf(vendQtd);
+        for (int c = 0; c < toAdd; c++){
+            newHistItems[histItems.length + c][0] = pedId;
+            newHistItems[histItems.length + c][1] = String.valueOf(atualIds[c]);
+            newHistItems[histItems.length + c][2] = String.valueOf(atualQtds[c]);
+        }
 
         return newHistItems;
+    }
+
+    public static void finalizarVenda(String[] histIdsPed, int[] idsCatalogo, String[] nomesCatalogo, int[] atualIds, int[] atualQtds, double[] precos, double[] histValPeds) {
+        String pedId = histIdsPed[histIdsPed.length - 1]; // ID do pedido
+        double pedVal = histValPeds[histValPeds.length - 1]; // Valor total do pedido
+        String line = "*********************************************************************************************";
+        String line2 = "---------------------------------------------------------------------------------------------";
+        int contRow = 1; // Índice linha
+
+        // Define data de emissão no modelo desejado
+        LocalDateTime agora = LocalDateTime.now(); // AI Help
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"); // AI Help
+        String dataFormatada = agora.format(formatter); // AI Help
+
+        // Imprime nota fiscal no modelo esperado
+        System.out.println(line);
+        System.out.printf("* %-90s*\n", "MACKSHOP");
+        System.out.printf("* %-90s*\n", "CNPJ: 12.345.678/0001-99");
+        System.out.println(line);
+        System.out.printf("* %-90s*\n", "NOTA FISCAL - VENDA AO CONSUMIDOR");
+        System.out.printf("* %-90s*\n", ("Pedido ID: " + pedId));
+        System.out.printf("* %-90s*\n", ("Data de Emissão: " + dataFormatada));
+        System.out.println(line);
+        System.out.printf("* %-3s| %-5s| %-30s| %-5s| %-13s| %-24s*\n", "#", "ID", "DESCRIÇÃO", "QTD", "VL. UNIT.", "VL. TOTAL");
+        System.out.println(line2);
+        // Verifica os dados de cada produto no pedido por seu ID
+        for(int i = 0; i < atualIds.length; i++){
+            int idProd = atualIds[i];
+            int qtdProd = atualQtds[i];
+            int getProdIndex = -1;
+            for(int a = 0; a < idsCatalogo.length; a++){
+                if(idsCatalogo[a] == idProd){
+                    getProdIndex = a;
+                }
+            }
+            String nomeProd = nomesCatalogo[getProdIndex];
+            double vlProd = precos[getProdIndex];
+            double vlProdTotal = (vlProd * qtdProd); // AI Help 
+
+            System.out.printf("* %-3s| %-5d| %-30s| %-5d| R$ %-10.2f| R$ %-21.2f*\n", contRow, idProd, nomeProd, qtdProd, vlProd, vlProdTotal);
+            contRow ++;
+        }
+        System.out.println(line2);
+        System.out.printf("* %-64s| R$ %-21.2f*\n", "SUBTOTAL", pedVal);
+        System.out.printf("* %-64s| R$ %-21.2f*\n", "TOTAL", pedVal);
+        System.out.println(line);
+        System.out.printf("* %-90s*\n", "OBRIGADO PELA PREFERÊNCIA! VOLTE SEMPRE!");
+        System.out.println(line);
     }
 }
