@@ -427,7 +427,7 @@ public class project {
                         String nomeProd = nomesCatalogo[getProdIndex];
                         double vlProd = precos[getProdIndex];
                         double vlProdTotal = vlProd * qtdProd;
-                        totalPedido += vlProdTotal; // ajuda da IA 
+                        totalPedido += vlProdTotal; // ajuda da IA
     
                         System.out.printf("* %-3d| %-5d| %-30s| %-5d| R$ %-10.2f| R$ %-21.2f*\n",
                                 contRow, idProd, nomeProd, qtdProd, vlProd, vlProdTotal);
