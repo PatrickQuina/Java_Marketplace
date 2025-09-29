@@ -76,7 +76,7 @@ public class project {
                     System.out.println("historicoVendas()");
                     break;
                 case 7:
-                    System.out.println("buscaVendaEspecifica()");
+                    buscaVendaEspecifica(historicoIdsPedidos, historicoValoresPedidos, historicoItensVendidos, idsProdutos, nomesProdutos, precosProdutos);
                     break;
                 case 8:
                     System.out.println("reporEstoque()");
@@ -368,5 +368,86 @@ public class project {
         System.out.println(line);
         System.out.printf("* %-90s*\n", "OBRIGADO PELA PREFERÊNCIA! VOLTE SEMPRE!");
         System.out.println(line);
+    }
+
+    public static void buscaVendaEspecifica(String[] histIds, double[] histVals, String[][] histItems, int[] idsCatalogo, String[] nomesCatalogo, double[] precos) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Digite o ID da compra: ");
+        String idCompra = scanner.nextLine();
+
+        boolean encontrado = false;
+        double totalPedido = 0;
+        int contRow = 1;
+
+        // Verifica se o histórico está vazio
+        if (histIds.length == 0) {
+            System.out.println("Nenhuma venda com ID " + idCompra + " encontrado!");
+            return;
+        }
+
+        // percorre o histórico de vendas
+        for (int i = 0; i < histIds.length; i++) {
+            if (histIds[i].equals(idCompra)) {
+                encontrado = true;
+                System.out.println("Venda encontrada!");
+                System.out.println("Pedido ID: " + histIds[i]);
+
+                // Nota fiscal case 5
+                LocalDateTime agora = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+                String dataFormatada = agora.format(formatter);
+    
+                System.out.println("*********************************************************************************************");
+                System.out.printf("* %-90s*\n", "MACKSHOP");
+                System.out.printf("* %-90s*\n", "CNPJ: 12.345.678/0001-99");
+                System.out.println("*********************************************************************************************");
+                System.out.printf("* %-90s*\n", "NOTA FISCAL - VENDA AO CONSUMIDOR");
+                System.out.printf("* %-90s*\n", "Pedido ID: " + idCompra);
+                System.out.printf("* %-90s*\n", "Data de Emissão: " + dataFormatada);
+                System.out.println("*********************************************************************************************");
+                System.out.printf("* %-3s| %-5s| %-30s| %-5s| %-13s| %-24s*\n", "#", "ID", "DESCRIÇÃO", "QTD", "VL. UNIT.", "VL. TOTAL");
+                System.out.println("---------------------------------------------------------------------------------------------");
+                
+                // verifica os itens da venda 
+                for (int j = 0; j < histItems.length; j++) {
+                    // Cada linha da matriz é um item
+                    if (histItems[j][0].equals(idCompra)){ // ve se é igual a compra
+                        int idProd = Integer.parseInt(histItems[j][1]); // ajuda da IA
+                        int qtdProd = Integer.parseInt(histItems[j][2]); // ajuda da IA
+    
+                        // Pega o índice do produto no catálogo
+                        int getProdIndex = -1;
+                        for (int a = 0; a < idsCatalogo.length; a++) {
+                            if (idsCatalogo[a] == idProd) {
+                                getProdIndex = a;
+                            }
+                        }
+    
+                        String nomeProd = nomesCatalogo[getProdIndex];
+                        double vlProd = precos[getProdIndex];
+                        double vlProdTotal = vlProd * qtdProd;
+                        totalPedido += vlProdTotal; // ajuda da IA 
+    
+                        System.out.printf("* %-3d| %-5d| %-30s| %-5d| R$ %-10.2f| R$ %-21.2f*\n",
+                                contRow, idProd, nomeProd, qtdProd, vlProd, vlProdTotal);
+                        contRow++;
+                    }
+                }
+    
+                System.out.println("---------------------------------------------------------------------------------------------");
+                System.out.printf("* %-64s| R$ %-21.2f*\n", "SUBTOTAL", totalPedido);
+                System.out.printf("* %-64s| R$ %-21.2f*\n", "TOTAL", totalPedido);
+                System.out.println("*********************************************************************************************");
+                System.out.printf("* %-90s*\n", "OBRIGADO PELA PREFERÊNCIA! VOLTE SEMPRE!");
+                System.out.println("*********************************************************************************************");
+    
+                break; //encontrou a venda
+            }
+        }
+    
+        if (!encontrado) {
+            System.out.println("ID" + idCompra + " não existe no histórico de vendas!");
+        }
     }
 }
