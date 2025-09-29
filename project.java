@@ -57,7 +57,7 @@ public class project {
                     System.out.println();
                     break;
                 case 4:
-                    System.out.println("resumoVenda()");
+                    resumoVenda(vendaAtualIds, vendaAtualQtds, idsProdutos, nomesProdutos, precosProdutos);
                     break;
                 case 5:
                     if(vendaAtualIds.length == 0){
@@ -73,7 +73,7 @@ public class project {
                     }
                     break;
                 case 6:
-                    System.out.println("historicoVendas()");
+                    historicoVendas(historicoIdsPedidos, historicoValoresPedidos);
                     break;
                 case 7:
                     buscaVendaEspecifica(historicoIdsPedidos, historicoValoresPedidos, historicoItensVendidos, idsProdutos, nomesProdutos, precosProdutos);
@@ -226,6 +226,44 @@ public class project {
             }
         }
     }
+    //Parte 4
+    public static void resumoVenda(int[] vendaIds, int[] vendaQtds, int[] idsCatalogo, String[] nomes, double[] precos) {
+        if (vendaIds.length == 0) {
+            System.out.println("Nenhum item adicionado à venda atual.");
+            return;
+        }
+
+        System.out.println("********** RESUMO DA VENDA ATUAL **********");
+        System.out.printf("%-25s | %-5s | %-10s | %-10s\n", "PRODUTO", "QTD", "PREÇO", "SUB/"); // Ia para formatar
+        System.out.println("-------------------------------------------------------------");
+
+        double total = 0.0;
+
+        for (int i = 0; i < vendaIds.length; i++) {
+            int id = vendaIds[i];
+            int qtd = vendaQtds[i];
+            int index = -1;
+
+        // Procura o índice do produto no catálogo
+            for (int j = 0; j < idsCatalogo.length; j++) {
+                if (idsCatalogo[j] == id) {
+                index = j;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            String nome = nomes[index];
+            double preco = precos[index];
+            double subtotal = preco * qtd;
+            total += subtotal;
+
+            System.out.printf("%-25s | %-5d | R$ %-8.2f | R$ %-8.2f\n", nome, qtd, preco, subtotal);
+        }
+        System.out.println("-------------------------------------------------------------");
+        System.out.printf("TOTAL DA VENDA: R$ %.2f\n", total);
+    }
+}
 
     public static int[] atualizaEstoque(int[] atualIds, int[] idsCatalogo, int[] atualQtds, int[] estoqueAtual) {
         int lastId = atualIds[atualIds.length - 1];
@@ -320,6 +358,18 @@ public class project {
         }
 
         return newHistItems;
+    }
+
+    public static void historicoVendas(String[] newHistIds, double[] newTotalVls){
+
+        if(newHistIds.length == 0){
+            System.out.println("Nenhuma venda foi registrada!");
+        }
+        else{
+            for (int i = 0; i < newHistIds.length; i++){
+                System.out.println("Pedido ID: " + newHistIds[i] + " | Valor total: R$ "+ newTotalVls[i]);
+            }
+        }
     }
 
     public static void finalizarVenda(String[] histIdsPed, int[] idsCatalogo, String[] nomesCatalogo, int[] atualIds, int[] atualQtds, double[] precos, double[] histValPeds) {
