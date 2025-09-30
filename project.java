@@ -460,9 +460,9 @@ public class project {
                 // verifica os itens da venda 
                 for (int j = 0; j < histItems.length; j++) {
                     // Cada linha da matriz é um item
-                    if (histItems[j][0].equals(idCompra)){ // ve se é igual a compra
-                        int idProd = Integer.parseInt(histItems[j][1]); // ajuda da IA
-                        int qtdProd = Integer.parseInt(histItems[j][2]); // ajuda da IA
+                    if (histItems[j][0].equals(idCompra)){ // AI ajuda
+                        int idProd = Integer.parseInt(histItems[j][1]); 
+                        int qtdProd = Integer.parseInt(histItems[j][2]); 
     
                         // Pega o índice do produto no catálogo
                         int getProdIndex = -1;
