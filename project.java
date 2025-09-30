@@ -502,7 +502,7 @@ public class project {
     }
 
     public static void relatorioEstoqueBaixo(int[] estoqueAtual, String[] nomesProdutos){
-        System.out.println("Produtos com menos de 10 unidades");
+        System.out.println("Produtos com menos de 7 unidades");
         
         for(int i = 0; i < estoqueAtual.length; i++){
             if(estoqueAtual[i] <=7 ){
