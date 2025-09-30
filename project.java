@@ -82,7 +82,7 @@ public class project {
                     System.out.println("reporEstoque()");
                     break;
                 case 9:
-                    System.out.println("relatorioEstoqueBaixo()");
+                    relatorioEstoqueBaixo(estoquesProdutos, nomesProdutos);
                     break;
                 default:
                     System.out.println("ERRO: Opção Inválida!");
@@ -498,6 +498,16 @@ public class project {
     
         if (!encontrado) {
             System.out.println("ID" + idCompra + " não existe no histórico de vendas!");
+        }
+    }
+
+    public static void relatorioEstoqueBaixo(int[] estoqueAtual, String[] nomesProdutos){
+        System.out.println("Produtos com menos de 10 unidades");
+        
+        for(int i = 0; i < estoqueAtual.length; i++){
+            if(estoqueAtual[i] <=7 ){
+                System.out.println(" " + nomesProdutos[i] + " = " + estoqueAtual[i]);
+            }
         }
     }
 }
