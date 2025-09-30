@@ -426,7 +426,6 @@ public class project {
         System.out.print("Digite o ID da compra: ");
         String idCompra = scanner.nextLine();
 
-        boolean encontrado = false;
         double totalPedido = 0;
         int contRow = 1;
 
@@ -439,7 +438,6 @@ public class project {
         // percorre o histórico de vendas
         for (int i = 0; i < histIds.length; i++) {
             if (histIds[i].equals(idCompra)) {
-                encontrado = true;
                 System.out.println("Venda encontrada!");
                 System.out.println("Pedido ID: " + histIds[i]);
 
@@ -491,14 +489,10 @@ public class project {
                 System.out.println("*********************************************************************************************");
                 System.out.printf("* %-90s*\n", "OBRIGADO PELA PREFERÊNCIA! VOLTE SEMPRE!");
                 System.out.println("*********************************************************************************************");
-    
-                break; //encontrou a venda
+                return;    
             }
         }
-    
-        if (!encontrado) {
-            System.out.println("ID" + idCompra + " não existe no histórico de vendas!");
-        }
+        System.out.println("ID " + idCompra + " não existe no histórico de vendas!");
     }
 
     public static void relatorioEstoqueBaixo(int[] estoqueAtual, String[] nomesProdutos){
